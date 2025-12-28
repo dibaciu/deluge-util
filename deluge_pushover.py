@@ -1,10 +1,11 @@
 import configparser
 import http.client, urllib
+import os
 import sys
 
 from dataclasses import dataclass
 
-CONFIG_FILE = 'deluge_pushover.cfg'
+CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'deluge_pushover.cfg')
 
 @dataclass(kw_only=True)
 class PushoverConfig:

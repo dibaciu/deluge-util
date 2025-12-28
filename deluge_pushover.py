@@ -6,11 +6,17 @@ import sys
 from dataclasses import dataclass
 
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'deluge_pushover.cfg')
+EVENTS = {
+    'add': 'Torrent Added',
+    'remove': 'Torrent Removed',
+    'complete': 'Torrent Completed',
+}
 
 @dataclass(kw_only=True)
 class PushoverConfig:
     user_key: str
     api_key: str
+
 
 def get_config(config_file: str)->PushoverConfig:
     config = configparser.ConfigParser(allow_unnamed_section=True)
@@ -31,13 +37,18 @@ except IndexError:
     print(f'Usage: {sys.argv[0]} torrent_id torrent_name save_path')
     sys.exit(255)
 
+try:
+    event = [value for key, value in EVENTS.items() if key in sys.argv[0]][0]
+except IndexError:
+    event = 'Unknown Event'
+
 conn = http.client.HTTPSConnection('api.pushover.net:443')
 conn.request("POST", '/1/messages.json',
              urllib.parse.urlencode({
                  'token': f'{config.api_key}',
                  'user': f'{config.user_key}',
                  'device': 'iphone',
-                 'message': f'{torrent_name} {save_path}',
+                 'message': f'{event}: {torrent_name}',
              }),
              {'Content-type': 'application/x-www-form-urlencoded'})
 response = conn.getresponse()

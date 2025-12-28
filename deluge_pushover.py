@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import configparser
 import http.client, urllib
 import os
